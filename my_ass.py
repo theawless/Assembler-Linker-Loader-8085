@@ -57,7 +57,7 @@ def test(_pass: str):
     newCode = []
     memaddr = 0
 
-    if _pass==1:
+    if _pass == 1:
         print("Pass1 ")
         for fileName in {"mys.x"}:
             inputFile = open(fileName, "r")
@@ -203,8 +203,7 @@ def test(_pass: str):
                     ifjmp[ifctr - 1] = memaddr
             print(symTable)
 
-    #else:
-        print("Pass2: ")
+        print('Pass2: ')
         for fileName in {"mys.x"}:
             inputFile = open(fileName, "r")
             fileName = fileName.split('.')[0]
@@ -233,23 +232,14 @@ def test(_pass: str):
                         newCode.append('MVI A,' + y)
                         newCode.append('ADI ' + z)
                         newCode.append('STA ' + str(symTable[fileName][x]))
-                        # memaddr += oplen['MVI']
-                        # memaddr += oplen['ADI']
-                        # memaddr += oplen['STA']
                     elif tryInt(y) and not tryInt(z):
                         newCode.append('LDA ' + str(symTable[fileName][z]))
                         newCode.append('ADI ' + y)
                         newCode.append('STA ' + str(symTable[fileName][x]))
-                        # memaddr += oplen['LDA']
-                        # memaddr += oplen['ADI']
-                        # memaddr += oplen['STA']
                     elif tryInt(z) and not tryInt(y):
                         newCode.append('LDA ' + str(symTable[fileName][y]))
                         newCode.append('ADI ' + z)
                         newCode.append('STA ' + str(symTable[fileName][x]))
-                        # memaddr += oplen['LDA']
-                        # memaddr += oplen['ADI']
-                        # memaddr += oplen['STA']
                     elif not tryInt(y) and not tryInt(z):
                         newCode.append('LDA ' + str(symTable[fileName][y]))
                         newCode.append('MOV B,A')
@@ -327,9 +317,6 @@ def test(_pass: str):
                     if tryInt(x):
                         newCode.append('PUSH D')
                         newCode.append('MVI E,' + x)
-                        # memaddr += oplen['PUSH']
-                        # memaddr += oplen['MVI']
-                        # symTable[fileName][loopctr] = '#' + str(memaddr)
                         loopctr += 1
                 elif elop.match(line):
                     newCode.append('MOV A,E')
@@ -338,11 +325,6 @@ def test(_pass: str):
                     newCode.append('JNZ ' + str(symTable[fileName][loopctr - 1]))
                     newCode.append('POP D')
                     loopctr -= 1
-                    # memaddr += oplen['MOV']
-                    # memaddr += oplen['SUI']
-                    # memaddr += oplen['MOV']
-                    # memaddr += oplen['JNZ']
-                    # memaddr += oplen['POP']
                 elif ifgt.match(line):
                     x = ifgt.match(line).group(1).lstrip().rstrip()
                     y = ifgt.match(line).group(2).lstrip().rstrip()
@@ -353,12 +335,6 @@ def test(_pass: str):
                     newCode.append('JP &&&' + str(ifctr))
                     newCode.append('JZ &&&' + str(ifctr))
                     ifctr += 1
-                    # memaddr += oplen['LDA']
-                    # memaddr += oplen['MOV']
-                    # memaddr += oplen['LDA']
-                    # memaddr += oplen['SUB']
-                    # memaddr += oplen['JP']
-                    # memaddr += oplen['JZ']
                 elif ifeq.match(line):
                     x = ifeq.match(line).group(1).lstrip().rstrip()
                     y = ifeq.match(line).group(2).lstrip().rstrip()
@@ -368,11 +344,6 @@ def test(_pass: str):
                     newCode.append('SUB B')
                     newCode.append('JNZ &&&' + str(ifctr))
                     ifctr += 1
-                    # memaddr += oplen['LDA']
-                    # memaddr += oplen['MOV']
-                    # memaddr += oplen['LDA']
-                    # memaddr += oplen['SUB']
-                    # memaddr += oplen['JNZ']
                 elif ifgte.match(line):
                     ifjmp[ifctr - 1] = memaddr
 
