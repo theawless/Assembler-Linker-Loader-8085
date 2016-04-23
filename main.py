@@ -1,18 +1,8 @@
-import my_ass, lin, loader
-
 x = []
 
 
-def exec():
-    x.append("sampleCode1a.x")
-    x.append("sampleCode1b.x")
-    runass()
-    runlin()
-    runload()
-
-
 def runass():
-    my_ass.test(x)
+    ass.test(x)
 
 
 def runlin():
@@ -21,6 +11,3 @@ def runlin():
 
 def runload():
     loader.loader(x)
-
-
-exec()
