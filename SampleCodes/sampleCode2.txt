@@ -1,2 +1,2 @@
-sampleCode2a.xxx
-sampleCode2b.xxx
+sampleCode2a.z
+sampleCode2b.z

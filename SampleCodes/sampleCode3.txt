@@ -1,2 +1,2 @@
-sampleCode3a.txt
-sampleCode3b.txt
+sampleCode3a.z
+sampleCode3b.z

@@ -39,7 +39,7 @@ class Loader:
         inputfile = open(filename + '.ls', 'r')
         code = inputfile.read()
         lines = code.split('\n')
-        outfile = open(filename + '.8085', 'w+')
+        outfile = open(filename + '.8085_O', 'w+')
         linkcode = []
         for line in lines:
             if '#' in line:

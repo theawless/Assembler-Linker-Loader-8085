@@ -6,6 +6,8 @@ from gi.repository import Gtk
 from linker import Linker
 from loader import Loader
 from assembler import Assembler
+from preprocessor import preprocess
+from simulator import Simulator
 
 
 class AllApp(Gtk.Application):
@@ -16,7 +18,6 @@ class AllApp(Gtk.Application):
         self.shell_ui = Gtk.Builder()
         self.shell_ui.add_from_file("shell.glade")
         self.handler_dict = {
-            "on_simulate_button_clicked": self.on_simulate_button_clicked,
             "on_start_file_chooser_button_clicked": self.on_start_file_chooser_button_clicked,
             "on_start_button_clicked": self.on_start_button_clicked,
             "on_simulator_open_file_button_clicked": self.on_simulator_open_file_button_clicked,
@@ -27,9 +28,11 @@ class AllApp(Gtk.Application):
         }
         self.shell_ui.connect_signals(self.handler_dict)
         self.x = []
+        self.z = []
         self.assembler_instance = None
         self.loader_instance = None
         self.linker_instance = None
+        self.simulator_instance = None
         # self.simulator=Simulator()
 
     def on_offset_button_clicked(self, widget):
@@ -39,9 +42,6 @@ class AllApp(Gtk.Application):
         window = self.shell_ui.get_object("all_window")
         self.add_window(window)
         window.show_all()
-
-    def on_simulate_button_clicked(self, widget):
-        pass
 
     def on_start_file_chooser_button_clicked(self, widget):
         window = self.shell_ui.get_object("all_window")
@@ -65,9 +65,10 @@ class AllApp(Gtk.Application):
             for widget in wids:
                 widget.destroy()
             i = 0
+            print (lines)
             for line in lines:
                 if line != '':
-                    self.x.append(line)
+                    self.z.append(line)
                     label = Gtk.Label("Code" + str(i))
                     tv = Gtk.TextView()
                     tb = tv.get_buffer()
@@ -80,6 +81,22 @@ class AllApp(Gtk.Application):
                         print(s)
             self.shell_ui.get_object("start_entry_number_entry").set_text(str(i))
             entries_box.show_all()
+            self.x = preprocess(self.z)
+            processed_box = self.shell_ui.get_object("processed_box")
+            i = 0
+            for file_name in self.x:
+                if file_name != '':
+                    label = Gtk.Label("Code" + str(i))
+                    tv = Gtk.TextView()
+                    tb = tv.get_buffer()
+                    processed_box.add(label)
+                    processed_box.add(tv)
+                    i += 1
+                    with open(file_name, "r") as file:
+                        s = file.read()
+                        tb.set_text(s)
+                        print(s)
+            processed_box.show_all()
         elif response == Gtk.ResponseType.CANCEL:
             print("Cancel clicked")
         dialog.destroy()
@@ -87,36 +104,34 @@ class AllApp(Gtk.Application):
     def on_start_button_clicked(self, widget):
         finalfile = self.x[0].split('.')[0] + '.8085'
         info = self.shell_ui.get_object("start_info_label")
-        str1 = ''
-        str1 += 'Interpreting...........\nRunning Assembler \n'
-        info.set_text(str1)
+        # str1 = ''
+        # str1 += 'Interpreting...........\nRunning Assembler \n'
+        # info.set_text(str1)
         self.assembler_instance = Assembler(self.shell_ui)
         self.assembler_instance.test(self.x)
-        str1 = str1 + 'Assembler Completed \n' + 'Running Linker \n'
-        info.set_text(str1)
+        # str1 = str1 + 'Assembler Completed \n' + 'Running Linker \n'
+        # info.set_text(str1)
         self.linker_instance = Linker(self.shell_ui, self.assembler_instance.symTable,
                                       self.assembler_instance.globTable,
                                       self.assembler_instance.filelen)
         self.linker_instance.linker(self.x)
-        str1 = str1 + 'Linker Completed \n' + 'Set offset and run loader\n'
-        info.set_text(str1)
+        # str1 = str1 + 'Linker Completed \n' + 'Set offset and run loader\n'
+        # info.set_text(str1)
         self.loader_instance = Loader(self.shell_ui)
         self.loader_instance.loader(self.x)
-        str1 = str1 + 'Loading Complete \n' + '\t\tFile ready to simulate.\n' + '\t\tFile name is : ' + finalfile + '\n'
-        info.set_text(str1)
+        # str1 = str1 + 'Loading Complete \n' + '\t\tFile ready to simulate.\n' + '\t\tFile name is : ' + finalfile + '\n'
+        # info.set_text(str1)
 
     def on_simulator_open_file_button_clicked(self, widget):
         pass
 
     def on_simulate_pass_button_clicked(self, widget):
-        pass
+        finalfile = self.x[0].split('.')[0] + '.8085'
+        self.simulator_instance = Simulator(self.shell_ui, self.shell_ui.get_object("all_window"))
+        self.simulator_instance.load(finalfile)
 
     def on_run_button_clicked(self, widget):
-        pass
-
-    # def opensimulator(*args):
-    #     finalfile = main.x[0].split('.')[0] + '.8085'
-    #     os.system('python3 sim.py ' + finalfile)
+        self.simulator_instance.callbackf()
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
